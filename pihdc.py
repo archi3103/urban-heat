@@ -1,3 +1,5 @@
+import glob
+import os
 import numpy as np
 import pandas as pd
 import torch
@@ -10,17 +12,33 @@ torch.manual_seed(42)
 # vars
 emb_dim = 128
 emb_path = 'final_emb.npy'
+met_folder_path = 'dataset/met_feat/'
+urban_folder_path = 'dataset/urban_feat/osm_features_100x100.csv'
+
 
 class embDataset (Dataset):
-    def __init__(self, emb_path):
+    def __init__(self, emb_path, urban_folder_path, met_folder_path):
         self.embs = np.load(emb_path)
+        self.urban_df = pd.read_csv(urban_folder_path)
+        self.xy = self.urban_df[['centroid_lon', 'centroid_lat']].values.astype(np.float32)
+
+        self.met_files = sorted(glob.glob(os.path.join(met_folder_path, "*.csv")))
+        self.num_grids = len(self.embs)
+        self.num_days = len(self.met_files)
 
     def __len__(self):
-        return len (self.embs)
+        return self.num_grids * self.num_days
 
     def __getitem__(self, idx):
-        emb = torch.tensor(self.embs[idx], dtype=torch.float32)
-        return emb  # (128,)
+        grid_idx = idx % self.num_grids
+        day_idx = idx // self.num_grids
+        emb = torch.tensor(self.embs[grid_idx], dtype=torch.float32)
+        x, y = self.xy[grid_idx]
+        t = float(day_idx + 1)
+        coord_3d = torch.tensor([x, y, t], dtype=torch.float32)
+        return emb, coord_3d # (128,), (x,y,t)
+
+
 
 class MultiHeadDecoder(nn.Module):
     """
