@@ -9,7 +9,7 @@ import torch.nn as nn
 # paths
 met_folder_path = 'dataset/met_feat/'
 urban_folder_path = 'dataset/urban_feat/osm_features_100x100.csv'
-met_tensor_path = 'ahmedabad_data_90days.npy'
+met_tensor_path = 'ahmedabad_90days_tensor_final.npy'
 
 
 class AhmDataset (Dataset):
@@ -140,6 +140,6 @@ with torch.no_grad():
 
 final_emb = np.concatenate(fused_emb, axis=0)   # (number_grids, emb_dim)
 
-np.save('final_emb.npy', final_emb)
+np.save('final_emb_real.npy', final_emb)
 
 print(f"Final embedding shape: {final_emb.shape}")

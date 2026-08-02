@@ -29,7 +29,7 @@ for day_idx, df in enumerate(dfs):
     df_sorted = df.sort_values('grid_id')
     master_tensor[:, day_idx, :] = df_sorted[feature_cols].values
 
-np.save('ahmedabad_data_90days.npy', master_tensor)
+np.save('ahmedabad_90days_tensor_final.npy', master_tensor)
 print(f"shape: {master_tensor.shape}")
 
 
