@@ -13,7 +13,7 @@ torch.manual_seed(42)
 # vars
 emb_dim = 128
 grid_size = 8
-emb_path = 'final_emb_real.npy'
+emb_path = 'final_emb_new.npy'
 met_folder_path = 'dataset/met_feat/'
 urban_folder_path = 'dataset/urban_feat/osm_features_100x100.csv'
 
@@ -59,10 +59,13 @@ class embDataset (Dataset):
         met_df = pd.read_csv(met_file)
 
         temp_val = met_df.loc[grid_idx, 'LST_Avg_C']
-        # normalized_temp = (temp_val - 20.0) / (50.0 - 20.0)
+        if pd.isna(temp_val):
+            # Fallback default value if data is missing for this grid cell
+            temp_val = 30.0
+        normalized_temp = (temp_val - 20.0) / (50.0 - 20.0)
 
-        # obs_temp = torch.tensor([normalized_temp], dtype=torch.float32).repeat(1, grid_size, grid_size)
-        obs_temp = torch.tensor([temp_val], dtype=torch.float32).repeat(1, grid_size, grid_size)
+        obs_temp = torch.tensor([normalized_temp], dtype=torch.float32).repeat(1, grid_size, grid_size)
+        # obs_temp = torch.tensor([temp_val], dtype=torch.float32).repeat(1, grid_size, grid_size)
 
         return emb, coord_3d, svf_tensor, obs_temp # (128,), (embs,coords, svf,t), (64, 1), (1, 8, 8)
 
@@ -91,6 +94,8 @@ class decoder(nn.Module):
             nn.ReLU(),
             nn.Conv2d(hidden_dim, out_channels, 1),  # (batch, 256, 8, 8) -> (batch, 5, 8, 8)
         )
+        nn.init.normal_(self.decoder[-1].weight, mean=0.0, std=1e-4)
+        nn.init.zeros_(self.decoder[-1].bias)
 
     def forward(self, embeddings):
         # embs : (batch, emb_dim)
@@ -150,29 +155,25 @@ class PINNLoss:
 
     def surface_energy_balance_loss(self, R_net, G, H, LE):
         residual = R_net - G - H - LE
+        residual = torch.clamp(residual, min=-1e3, max=1e3) # Safety clamp
         return torch.mean(residual ** 2)
 
     def heat_equation_pde_loss(self, T_preds, R_net, G, H, LE):
-        """
-        Enforces Heat Equation via finite-difference spatial Laplacian and SEB source term:
-        - Laplacian (∇²T) calculated using neighboring piembsel differences on 8embs8 patches.
-        - Source term S = (R_net - G - H - LE) / (ρ * cp * d)
-        """
-        # 1. Compute Source Term from SEB outputs
         S = (R_net - G - H - LE) / self.rho_cp_d
+        S = torch.clamp(S, min=-1e2, max=1e2) # Safety clamp
 
-        # 2. Approembsimate spatial second derivatives (Laplacian) via finite differences
         d2T_dx2 = T_preds[:, :, :, 2:] - 2 * T_preds[:, :, :, 1:-1] + T_preds[:, :, :, :-2]
         d2T_dy2 = T_preds[:, :, 2:, :] - 2 * T_preds[:, :, 1:-1, :] + T_preds[:, :, :-2, :]
 
-        # Trim to matching inner shape
         laplacian_T = d2T_dx2[:, :, :-2, :] + d2T_dy2[:, :, :, :-2]
-        S_trimmed = S[:, :, 1:-1, 1:-1]
+        laplacian_T = torch.clamp(laplacian_T, min=-1e3, max=1e3) # Safety clamp
 
-        # 3. PDE Residual: - α(∇²T) - S = 0
+        S_trimmed = S[:, :, 1:-1, 1:-1]
         pde_residual = - (self.alpha * laplacian_T) - S_trimmed
+        pde_residual = torch.clamp(pde_residual, min=-1e3, max=1e3) # Safety clamp
 
         return torch.mean(pde_residual ** 2)
+
 
     def morphological_consistency_loss(self, T_preds, svf):
         """
@@ -199,7 +200,8 @@ class PINNLoss:
 
         # Compute dot product on the matched 7x7 shapes
         dot = dT_dx_inner * dSVF_dx_inner + dT_dy_inner * dSVF_dy_inner
-        return torch.mean(torch.relu(dot) ** 2)
+        # return torch.mean(torch.relu(dot) ** 2)
+        return torch.mean(dot ** 2)
 
     def compute_total_loss(self, predsictions, targets, svf):
         """
@@ -261,10 +263,14 @@ def train(dataloader, model, loss_fn, optimizer):
         preds = model(embs)
         targets = {'T_obs': obs_temp}
         loss_dict = loss_fn.compute_total_loss(preds, targets, svf)
+
+        # print(f"Data: {loss_dict['L_data'].item()} | SEB: {loss_dict['L_seb'].item()} | PDE: {loss_dict['L_pde'].item()} | Morph: {loss_dict['L_morph'].item()}")
+
         loss = loss_dict['total']
 
         # Backpropagation
         loss.backward()
+        torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)    # gradient clipping
         optimizer.step()
         optimizer.zero_grad()
 
