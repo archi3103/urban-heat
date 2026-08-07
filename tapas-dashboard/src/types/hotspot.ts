@@ -138,7 +138,7 @@ export interface GSOEHotspot {
   drivers: string[];
   interventions: InterventionPill[];
   heatIntensity: number; // Normalized 0-1 for heat maps
-  
+
   // New columns from the Master Scenarios CSV
   actualUrbanDensity: number;
   densityPercent: number;
@@ -146,7 +146,7 @@ export interface GSOEHotspot {
   spatialPenalty: number;
   feasibilityAdjustedScore: number;
   feasibilityRank: number;
-  
+
   bestScenario: GSOEScenario;
   scenarios: GSOEScenario[];
 }
@@ -166,7 +166,7 @@ export const INTERVENTION_COLUMN_LABELS: Record<string, string> = {
 };
 
 /** Point to Ahmedabad_Master_Scenarios_REAL_Density.csv placed inside public/ */
-export const DEFAULT_HOTSPOT_DATA_URL = "/Ahmedabad_Master_Scenarios_FINAL_Sorted (1) (3).csv";
+export const DEFAULT_HOTSPOT_DATA_URL = "/data/ahmedabad_sorted_final.csv";
 
 export const AHMEDABAD_CENTER = { lat: 23.0225, lng: 72.5714 } as const;
 
