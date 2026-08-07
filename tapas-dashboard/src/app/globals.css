@@ -1,0 +1,191 @@
+@import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
+
+/*
+ * TAPAS Design Tokens — civic-tech dark mode palette
+ * Deep slate base with thermal accent gradients (hot red → cool blue)
+ */
+:root {
+  --background: #020617;
+  --foreground: #f1f5f9;
+
+  /* Surface layers */
+  --surface-base: #020617;
+  --surface-raised: #0f172a;
+  --surface-overlay: #1e293b;
+
+  /* Thermal accents */
+  --thermal-hot: #dc2626;
+  --thermal-warm: #ea580c;
+  --thermal-neutral: #7c3aed;
+  --thermal-cool: #2563eb;
+  --thermal-cold: #0ea5e9;
+
+  /* Semantic */
+  --border-subtle: rgba(51, 65, 85, 0.6);
+  --border-strong: rgba(71, 85, 105, 0.8);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface-base: var(--surface-base);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-overlay: var(--surface-overlay);
+  --color-thermal-hot: var(--thermal-hot);
+  --color-thermal-cool: var(--thermal-cool);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+/* Force dark civic-tech theme (no light-mode flip) */
+html {
+  color-scheme: dark;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+/* Custom scrollbar for dark panels */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.4);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.6);
+}
+
+/* Range input track styling (Firefox) */
+input[type="range"]::-moz-range-track {
+  height: 6px;
+  border-radius: 9999px;
+  background: rgb(51 65 85);
+}
+
+input[type="range"]::-moz-range-thumb {
+  height: 14px;
+  width: 14px;
+  border-radius: 9999px;
+  border: none;
+}
+
+/* ─── Leaflet / TAPAS Map Overrides ─────────────────────────────────────── */
+
+/* Dark tactical satellite: dim & desaturate Esri imagery */
+.tapas-map .leaflet-tile-pane img {
+  filter: brightness(0.62) contrast(1.18) saturate(0.75);
+}
+
+.tapas-map .leaflet-container {
+  background: #020617;
+  font-family: inherit;
+}
+
+/* Neon hotspot pin markers */
+.tapas-hotspot-marker {
+  background: transparent !important;
+  border: none !important;
+}
+
+.tapas-pin-wrapper {
+  position: relative;
+  width: var(--pin-size);
+  height: var(--pin-size);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tapas-pin-core {
+  position: relative;
+  z-index: 2;
+  width: calc(var(--pin-size) * 0.45);
+  height: calc(var(--pin-size) * 0.45);
+  border-radius: 50%;
+  background: var(--pin-color);
+  box-shadow:
+    0 0 8px var(--pin-color),
+    0 0 16px color-mix(in srgb, var(--pin-color) 60%, transparent);
+}
+
+.tapas-pin-tip {
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  z-index: 1;
+  width: 2px;
+  height: calc(var(--pin-size) * 0.35);
+  transform: translateX(-50%);
+  background: linear-gradient(to bottom, var(--pin-color), transparent);
+}
+
+.tapas-pin-pulse {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--pin-color) 40%, transparent);
+  animation: tapas-pin-pulse 2s ease-out infinite;
+}
+
+@keyframes tapas-pin-pulse {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+/* Tactical popup dark theme */
+.tapas-hotspot-popup .leaflet-popup-content-wrapper {
+  background: rgba(15, 23, 42, 0.97);
+  border: 1px solid rgba(71, 85, 105, 0.6);
+  border-radius: 0.5rem;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(220, 38, 38, 0.08);
+  backdrop-filter: blur(12px);
+  padding: 0;
+}
+
+.tapas-hotspot-popup .leaflet-popup-content {
+  margin: 12px;
+  line-height: 1.4;
+}
+
+.tapas-hotspot-popup .leaflet-popup-tip {
+  background: rgba(15, 23, 42, 0.97);
+  border: 1px solid rgba(71, 85, 105, 0.6);
+  box-shadow: none;
+}
+
+.tapas-hotspot-popup .leaflet-popup-close-button {
+  color: #94a3b8 !important;
+  font-size: 18px !important;
+  top: 6px !important;
+  right: 8px !important;
+}
+
+.tapas-hotspot-popup .leaflet-popup-close-button:hover {
+  color: #f1f5f9 !important;
+}
+
+.tapas-popup-inner {
+  color: #f1f5f9;
+}
+
