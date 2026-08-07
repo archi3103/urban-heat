@@ -87,8 +87,8 @@ export function ThermalMap({
           Active Hotspots
         </p>
         <p className="font-mono text-sm font-bold text-slate-200">
-          {hotspots.length}
-          <span className="text-slate-500"> / {hotspots.length}</span>
+          {hotspots.filter((h) => h.isHotspot).length}
+          <span className="text-slate-500"> / {hotspots.length} Grids</span>
         </p>
       </div>
     </div>

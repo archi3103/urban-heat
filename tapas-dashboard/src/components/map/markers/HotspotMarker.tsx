@@ -79,6 +79,31 @@ function glowColor(rank: number): string {
   return "#38bdf8";                 // Blue/Cyan (Lower tier)
 }
 
+function createNeutralIcon(isSelected: boolean): L.DivIcon {
+  const size = isSelected ? 14 : 7;
+  const color = isSelected ? "#8be9fd" : "rgba(148, 163, 184, 0.2)";
+  const borderColor = isSelected ? "#8be9fd" : "rgba(100, 116, 139, 0.4)";
+
+  return L.divIcon({
+    className: `tapas-neutral-marker${isSelected ? " selected-pin" : ""}`,
+    html: `
+      <div style="
+        width: ${size}px;
+        height: ${size}px;
+        background-color: ${color};
+        border: 1px solid ${borderColor};
+        border-radius: 50%;
+        box-shadow: ${isSelected ? "0 0 6px #8be9fd" : "none"};
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+      "></div>
+    `,
+    iconSize: [size, size],
+    iconAnchor: [size / 2, size / 2],
+    popupAnchor: [0, -size],
+  });
+}
+
 function createNeonPinIcon(rank: number, isSelected: boolean): L.DivIcon {
   const color = isSelected ? "#8be9fd" : glowColor(rank);
   const size = isSelected ? 28 : (rank <= 3 ? 24 : rank <= 15 ? 18 : 12);
@@ -106,17 +131,25 @@ interface HotspotMarkerProps {
 }
 
 /**
- * Glowing neon pin for UHI hotspots.
+ * Glowing neon pin for top 100 UHI hotspots, and neutral clickable markers for standard grids.
  * Opens a tactical popup card on click.
  */
 export function HotspotMarker({ hotspot, isSelected = false, onSelect }: HotspotMarkerProps) {
-  const icon = createNeonPinIcon(hotspot.globalRank, isSelected);
+  const icon = hotspot.isHotspot
+    ? createNeonPinIcon(hotspot.globalRank ?? 999, isSelected)
+    : createNeutralIcon(isSelected);
+
+  const zIndex = isSelected
+    ? 9999
+    : hotspot.isHotspot
+    ? 1000 - (hotspot.globalRank ?? 999)
+    : 10;
 
   return (
     <Marker
       position={[hotspot.lat, hotspot.lon]}
       icon={icon}
-      zIndexOffset={isSelected ? 9999 : 1000 - hotspot.globalRank}
+      zIndexOffset={zIndex}
       eventHandlers={{
         click: () => {
           if (onSelect) onSelect();

@@ -223,50 +223,58 @@ function normalizeGroupedRows(grouped: Record<string, GSOEHotspotRow[]>): GSOEHo
   for (const gridId of allGridIds) {
     const rows = grouped[gridId];
 
-    // Find the scenario representing the best strategy
-    let bestRow = rows.find((r) => r.Is_Best.toLowerCase() === "true");
-    if (!bestRow) {
-      bestRow = rows.find((r) => r.Scenario_Rank === 1) ?? rows[0];
-    }
+    // Inside each grid cell, sort the array of scenarios by:
+    // 1) Feasibility Rank (primary — lower numeric rank = higher feasibility).
+    // 2) Temperature Reduction / Cooling (°C) (secondary — higher cooling = better).
+    const sortedRows = [...rows].sort((a, b) => {
+      if (a.Feasibility_Rank !== b.Feasibility_Rank) {
+        return a.Feasibility_Rank - b.Feasibility_Rank;
+      }
+      return b.Cooling - a.Cooling;
+    });
 
-    const scenarios: GSOEScenario[] = rows
-      .map((r) => ({
-        scenarioRank: r.Scenario_Rank,
-        scenarioId: r.Scenario_ID,
-        scenarioName: r.Scenario_Name,
-        scenarioType: r.Scenario_Type,
-        treeCanopy: r.Tree_Canopy,
-        greenRoof: r.Green_Roof,
-        coolRoof: r.Cool_Roof,
-        coolPavement: r.Cool_Pavement,
-        rainGarden: r.Rain_Garden,
-        waterBody: r.Water_Body,
-        scenarioLst: r.Scenario_LST,
-        cooling: r.Cooling,
-        coolingPercent: r.Cooling_Percent,
-        isBest: r.Is_Best.toLowerCase() === "true",
-        actualUrbanDensity: r.Actual_Urban_Density,
-        feasibilityRank: r.Feasibility_Rank,
-        feasibilityAdjustedScore: r.Feasibility_Adjusted_Score,
-      }))
-      .sort((a, b) => a.scenarioRank - b.scenarioRank);
+    const bestRow = sortedRows[0];
+
+    const scenarios: GSOEScenario[] = sortedRows.map((r) => ({
+      scenarioRank: r.Scenario_Rank,
+      scenarioId: r.Scenario_ID,
+      scenarioName: r.Scenario_Name,
+      scenarioType: r.Scenario_Type,
+      treeCanopy: r.Tree_Canopy,
+      greenRoof: r.Green_Roof,
+      coolRoof: r.Cool_Roof,
+      coolPavement: r.Cool_Pavement,
+      rainGarden: r.Rain_Garden,
+      waterBody: r.Water_Body,
+      scenarioLst: r.Scenario_LST,
+      cooling: r.Cooling,
+      coolingPercent: r.Cooling_Percent,
+      isBest: r.Is_Best.toLowerCase() === "true",
+      actualUrbanDensity: r.Actual_Urban_Density,
+      feasibilityRank: r.Feasibility_Rank,
+      feasibilityAdjustedScore: r.Feasibility_Adjusted_Score,
+      availableGround: r.Available_Ground,
+    }));
 
     const heatIntensity = Math.min(
       1,
       Math.max(0, (bestRow.Original_LST - minLst) / lstRange),
     );
 
+    const isHotspot = bestRow.Global_Rank !== undefined && bestRow.Global_Rank !== null && !isNaN(bestRow.Global_Rank) && bestRow.Global_Rank <= 100;
+
     hotspots.push({
       gridId: bestRow.Grid_ID,
       globalRank: bestRow.Global_Rank,
+      isHotspot,
       lat: bestRow.EE_Lat,
       lon: bestRow.EE_Lon,
       severity: bestRow.Severity,
       originalLst: bestRow.Original_LST,
       scenarioLst: bestRow.Scenario_LST,
-      bestCooling: bestRow.Best_Cooling,
+      bestCooling: bestRow.Cooling,
       coolingPercent: bestRow.Cooling_Percent,
-      bestIntervention: bestRow.Best_Intervention,
+      bestIntervention: bestRow.Scenario_Name,
       drivers: [bestRow.Driver_1, bestRow.Driver_2, bestRow.Driver_3].filter(Boolean),
       interventions: extractInterventions(bestRow),
       heatIntensity,
@@ -276,11 +284,20 @@ function normalizeGroupedRows(grouped: Record<string, GSOEHotspotRow[]>): GSOEHo
       spatialPenalty: bestRow.Spatial_Penalty,
       feasibilityAdjustedScore: bestRow.Feasibility_Adjusted_Score,
       feasibilityRank: bestRow.Feasibility_Rank,
+      bestScenario: scenarios[0],
       scenarios,
     });
   }
 
-  return hotspots.sort((a, b) => a.globalRank - b.globalRank);
+  // Sort hotspots: top 100 hotspots first (isHotspot = true, sorted by globalRank), followed by standard grids
+  return hotspots.sort((a, b) => {
+    if (a.isHotspot && b.isHotspot) {
+      return (a.globalRank ?? 999999) - (b.globalRank ?? 999999);
+    }
+    if (a.isHotspot) return -1;
+    if (b.isHotspot) return 1;
+    return a.gridId.localeCompare(b.gridId);
+  });
 }
 
 /** Parse raw CSV text into normalized hotspot records with grouped scenarios */
@@ -307,11 +324,14 @@ export function parseHotspotCsv(csvText: string): GSOEHotspot[] {
       groupedRows[gridId] = [];
     }
 
+    const rawGlobalRank = record.global_rank;
+    const globalRank = (rawGlobalRank !== undefined && rawGlobalRank !== "") ? toNumber(rawGlobalRank) : undefined;
+
     groupedRows[gridId].push({
       Grid_ID: gridId,
       EE_Lat: toNumber(record.ee_lat),
       EE_Lon: toNumber(record.ee_lon),
-      Global_Rank: toNumber(record.global_rank, i),
+      Global_Rank: globalRank,
       Severity: record.severity ?? "Moderate",
       Original_LST: toNumber(record.original_lst, 30),
       Driver_1: record.driver_1 ?? "",

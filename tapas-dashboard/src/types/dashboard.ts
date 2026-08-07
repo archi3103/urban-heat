@@ -1,5 +1,7 @@
-/** Dashboard command-center tab identifiers */
-// export type DashboardTab = "heat-stress" | "pinn-simulator" | "strategy";
+
+
+// /** Dashboard command-center tab identifiers */
+// export type DashboardTab = "heat-stress" | "pinn-simulator";
 
 // export interface TabConfig {
 //   id: DashboardTab;
@@ -12,20 +14,14 @@
 //   {
 //     id: "heat-stress",
 //     label: "Heat Stress Maps & Diagnostics",
-//     icon: "🗺️",
+//     icon: "",
 //     description: "UHI thermal map and key driver breakdown",
 //   },
 //   {
 //     id: "pinn-simulator",
 //     label: "PINN Core & Scenario Simulator",
-//     icon: "🧠",
+//     icon: "",
 //     description: "Validated AI/ML metrics and GSOE intervention controls",
-//   },
-//   {
-//     id: "strategy",
-//     label: "Optimal Strategy & Pareto Analytics",
-//     icon: "📈",
-//     description: "NSGA-II frontier and recommended interventions",
 //   },
 // ];
 
@@ -33,7 +29,7 @@
 
 
 /** Dashboard command-center tab identifiers */
-export type DashboardTab = "heat-stress" | "pinn-simulator";
+export type DashboardTab = "heat-stress";
 
 export interface TabConfig {
   id: DashboardTab;
@@ -48,11 +44,5 @@ export const DASHBOARD_TABS: TabConfig[] = [
     label: "Heat Stress Maps & Diagnostics",
     icon: "",
     description: "UHI thermal map and key driver breakdown",
-  },
-  {
-    id: "pinn-simulator",
-    label: "PINN Core & Scenario Simulator",
-    icon: "",
-    description: "Validated AI/ML metrics and GSOE intervention controls",
   },
 ];

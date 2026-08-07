@@ -71,7 +71,7 @@ export interface GSOEHotspotRow {
   Grid_ID: string;
   EE_Lat: number;
   EE_Lon: number;
-  Global_Rank: number;
+  Global_Rank?: number;
   Severity: string;
   Original_LST: number;
   Driver_1: string;
@@ -120,11 +120,13 @@ export interface GSOEScenario {
   actualUrbanDensity: number;
   feasibilityRank: number;
   feasibilityAdjustedScore: number;
+  availableGround: number;
 }
 
 export interface GSOEHotspot {
   gridId: string;
-  globalRank: number;
+  globalRank?: number;
+  isHotspot: boolean;
   lat: number;
   lon: number;
   severity: string;
@@ -145,6 +147,7 @@ export interface GSOEHotspot {
   feasibilityAdjustedScore: number;
   feasibilityRank: number;
   
+  bestScenario: GSOEScenario;
   scenarios: GSOEScenario[];
 }
 
@@ -163,7 +166,7 @@ export const INTERVENTION_COLUMN_LABELS: Record<string, string> = {
 };
 
 /** Point to Ahmedabad_Master_Scenarios_REAL_Density.csv placed inside public/ */
-export const DEFAULT_HOTSPOT_DATA_URL = "/Ahmedabad_Master_Scenarios_REAL_Density.csv";
+export const DEFAULT_HOTSPOT_DATA_URL = "/Ahmedabad_Master_Scenarios_FINAL_Sorted (1) (3).csv";
 
 export const AHMEDABAD_CENTER = { lat: 23.0225, lng: 72.5714 } as const;
 

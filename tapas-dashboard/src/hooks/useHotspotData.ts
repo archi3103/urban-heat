@@ -37,6 +37,16 @@ export function useHotspotData(
       const data = await loadHotspotData(target);
       setHotspots(data);
     } catch (err) {
+      if (!url && target === "/Ahmedabad_Master_Scenarios_FINAL_Sorted (1) (3).csv") {
+        try {
+          const fallbackData = await loadHotspotData("/Ahmedabad_Master_Scenarios_REAL_Density.csv");
+          setHotspots(fallbackData);
+          setLoading(false);
+          return;
+        } catch (fallbackErr) {
+          // ignore fallback error and propagate the primary error
+        }
+      }
       const message =
         err instanceof Error ? err.message : "Failed to load hotspot data";
       setError(message);
@@ -52,7 +62,9 @@ export function useHotspotData(
 
   const topTierHotspots = useMemo(
     () =>
-      hotspots.filter((h) => h.globalRank <= TOP_TIER_RANK_THRESHOLD),
+      hotspots.filter(
+        (h) => h.globalRank !== undefined && h.globalRank <= TOP_TIER_RANK_THRESHOLD,
+      ),
     [hotspots],
   );
 
