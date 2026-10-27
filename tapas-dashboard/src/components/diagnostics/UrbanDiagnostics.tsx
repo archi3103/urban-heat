@@ -35,7 +35,6 @@ export function UrbanDiagnostics({
       label: "Land Surface Temp.",
       value: selectedHotspot.originalLst.toFixed(2),
       unit: "°C",
-      trend: "up" as const,
       delta: `Severity: ${selectedHotspot.severity}`,
       clickable: false,
     },
@@ -44,7 +43,6 @@ export function UrbanDiagnostics({
       label: "Cooling Potential",
       value: `-${selectedHotspot.bestCooling.toFixed(2)}`,
       unit: "°C",
-      trend: "down" as const,
       delta: `Optimal: ${selectedHotspot.bestIntervention}`,
       clickable: true,
     },
@@ -74,16 +72,6 @@ export function UrbanDiagnostics({
                 {card.clickable && (
                   <span className="text-[9px] uppercase font-bold text-cyan-400 bg-cyan-950/40 border border-cyan-800/30 px-1 py-0.2 rounded opacity-80 group-hover:opacity-100">
                     Compare
-                  </span>
-                )}
-                {card.trend && (
-                  <span
-                    className={`text-xs font-mono ${
-                      card.trend === "up" ? "text-red-400" : "text-blue-400"
-                    }`}
-                    aria-label={`Trend: ${card.trend}`}
-                  >
-                    {card.trend === "up" ? "↑" : "↓"}
                   </span>
                 )}
               </div>

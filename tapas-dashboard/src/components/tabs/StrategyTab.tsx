@@ -51,7 +51,7 @@ import { StrategyRecommendations } from "@/components/strategy/StrategyRecommend
 import { PLACEHOLDER_PARETO } from "@/lib/constants";
 
 /**
- * Tab 3 — Full-page NSGA-II Pareto frontier and optimal strategy table.
+ * Tab 3 — Example cost/cooling trade-offs and strategy table.
  */
 export function StrategyTab() {
   return (
@@ -65,10 +65,10 @@ export function StrategyTab() {
         {/* Page header */}
         <header className="shrink-0 bg-[#101018] border border-[#2d2d3f] p-5 rounded-xl">
           <h2 className="text-base font-bold text-white">
-            Optimal Strategy &amp; Pareto Analytics
+            Strategy &amp; Trade-off Examples
           </h2>
           <p className="mt-1 text-xs text-[#8be9fd]">
-            NSGA-II multi-objective optimization · cost vs. cooling trade-off frontier
+            Illustrative cost-versus-cooling comparisons · not model output
           </p>
         </header>
 
@@ -78,7 +78,7 @@ export function StrategyTab() {
           aria-label="Pareto frontier chart"
         >
           <h3 className="text-xs font-bold text-[#ffb86c] uppercase tracking-wider mb-4">
-            Pareto Frontier — Cost vs. Cooling
+            Example Trade-off — Cost vs. Cooling
           </h3>
           <div className="w-full h-[320px] max-w-4xl mx-auto flex items-center justify-center">
             <ParetoAnalytics points={PLACEHOLDER_PARETO} variant="compact" />

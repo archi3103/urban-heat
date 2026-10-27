@@ -34,10 +34,10 @@ export function ParetoAnalytics({ points, variant = "compact" }: ParetoAnalytics
       <div className="mb-3 flex items-center justify-between gap-4">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-            NSGA-II Pareto Frontier
+            Example Cost / Cooling Trade-off
           </p>
           <p className="mt-0.5 text-[11px] text-slate-600">
-            Intervention cost vs. projected cooling effect
+            Illustrative values only · not model output
           </p>
         </div>
         {isFull && (

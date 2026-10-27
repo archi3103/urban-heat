@@ -11,6 +11,24 @@ interface ScenarioSimulatorPanelProps {
   onReset: () => void;
 }
 
+const SCENARIO_PRESETS: {
+  name: string;
+  values: InterventionValues;
+}[] = [
+  {
+    name: "Aggressive greening",
+    values: { albedo: 0.35, ndvi: 0.62, wasteHeat: 28 },
+  },
+  {
+    name: "Cool roofs",
+    values: { albedo: 0.42, ndvi: 0.3, wasteHeat: 40 },
+  },
+  {
+    name: "Balanced mix",
+    values: { albedo: 0.28, ndvi: 0.48, wasteHeat: 35 },
+  },
+];
+
 /**
  * Right panel for Tab 2 — GSOE intervention sliders and scenario controls.
  */
@@ -77,7 +95,7 @@ export function ScenarioSimulatorPanel({
               />
             </dl>
             <p className="mt-3 text-[10px] text-slate-600">
-              Placeholder projection — wire to GSOE re-run API
+              Illustrative estimate only — no GSOE model/API is connected.
             </p>
           </div>
 
@@ -85,19 +103,30 @@ export function ScenarioSimulatorPanel({
           <div className="rounded-xl border border-dashed border-slate-700/60 bg-slate-950/30 p-4">
             <p className="text-xs font-medium text-slate-400">Scenario Presets</p>
             <p className="mt-1 text-[11px] text-slate-600">
-              Load NSGA-II optimal strategies from Tab 3 or connect GSOE batch runs.
+              Apply a sample slider preset. These values are not model recommendations.
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
-              {["Aggressive Greening", "Cool Roofs", "Balanced Mix"].map((preset) => (
+              {SCENARIO_PRESETS.map((preset) => (
                 <button
-                  key={preset}
+                  key={preset.name}
                   type="button"
-                  disabled
-                  className="rounded-md border border-slate-700/50 px-2.5 py-1 text-[11px] text-slate-500 opacity-60"
+                  onClick={() => {
+                    for (const key of ["albedo", "ndvi", "wasteHeat"] as const) {
+                      onChange(key, preset.values[key]);
+                    }
+                  }}
+                  className="rounded-md border border-slate-700/70 px-2.5 py-1 text-[11px] text-slate-300 transition-colors hover:border-cyan-500/50 hover:bg-cyan-950/30 hover:text-cyan-200"
                 >
-                  {preset}
+                  {preset.name}
                 </button>
               ))}
+              <button
+                type="button"
+                onClick={onReset}
+                className="rounded-md border border-slate-700/70 px-2.5 py-1 text-[11px] text-slate-400 transition-colors hover:border-slate-500 hover:bg-slate-800 hover:text-slate-200"
+              >
+                Baseline
+              </button>
             </div>
           </div>
         </div>

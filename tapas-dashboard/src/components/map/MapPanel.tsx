@@ -43,6 +43,7 @@ interface MapPanelProps {
   hotspots: GSOEHotspot[];
   loading: boolean;
   error: string | null;
+  isDemoData?: boolean;
   selectedHotspot: GSOEHotspot | null;
   onSelectHotspot: (hotspot: GSOEHotspot) => void;
 }
@@ -56,6 +57,7 @@ export function MapPanel({
   hotspots,
   loading,
   error,
+  isDemoData = false,
   selectedHotspot,
   onSelectHotspot,
 }: MapPanelProps) {
@@ -67,12 +69,12 @@ export function MapPanel({
       aria-label="Interactive thermal map"
     >
       {fullWidth ? (
-        <div className="pointer-events-none absolute left-4 top-4 z-[500] rounded-lg border border-slate-700/50 bg-slate-900/80 px-3 py-2 backdrop-blur-md">
+        <div className="pointer-events-none absolute left-4 top-4 z-[500] max-w-[calc(100%-2rem)] rounded-lg border border-slate-700/50 bg-slate-900/90 px-3 py-2 backdrop-blur-md">
           <h2 className="text-xs font-semibold tracking-wide text-slate-100">
-            Urban Thermal Map
+            Urban heat map
           </h2>
-          <p className="mt-0.5 text-[10px] text-slate-500">
-            Ahmedabad UHI · GSOE intervention overlay
+          <p className="mt-0.5 text-[10px] text-slate-400">
+            Ahmedabad · {isDemoData ? "Illustrative sample locations" : "GSOE scenario overlay"}
           </p>
         </div>
       ) : (
@@ -88,6 +90,7 @@ export function MapPanel({
         {!loading && !error && hotspots.length > 0 && (
           <ThermalMap
             hotspots={hotspots}
+            isDemoData={isDemoData}
             selectedHotspot={selectedHotspot}
             onSelectHotspot={onSelectHotspot}
           />

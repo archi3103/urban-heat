@@ -30,7 +30,6 @@ export function InterventionSidebar({
         collapsed ? "w-12" : "w-72 lg:w-80"
       }`}
       aria-label="Intervention controls"
-      aria-expanded={!collapsed}
     >
       {/* Collapse toggle — always visible on the inner edge */}
       <button

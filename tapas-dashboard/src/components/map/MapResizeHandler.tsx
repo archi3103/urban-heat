@@ -12,9 +12,15 @@ export function MapResizeHandler() {
 
   useEffect(() => {
     const container = map.getContainer();
+    let rafId = 0;
 
     const invalidate = () => {
-      map.invalidateSize({ animate: false });
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        if (container.clientWidth > 0 && container.clientHeight > 0) {
+          map.invalidateSize({ animate: false });
+        }
+      });
     };
 
     invalidate();
@@ -25,6 +31,7 @@ export function MapResizeHandler() {
     window.addEventListener("resize", invalidate);
 
     return () => {
+      cancelAnimationFrame(rafId);
       observer.disconnect();
       window.removeEventListener("resize", invalidate);
     };

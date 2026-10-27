@@ -21,6 +21,7 @@ const DARK_LABELS_URL =
 
 interface ThermalMapProps {
   hotspots: GSOEHotspot[];
+  isDemoData: boolean;
   selectedHotspot: GSOEHotspot | null;
   onSelectHotspot: (hotspot: GSOEHotspot) => void;
 }
@@ -33,6 +34,7 @@ interface ThermalMapProps {
  */
 export function ThermalMap({
   hotspots,
+  isDemoData,
   selectedHotspot,
   onSelectHotspot,
 }: ThermalMapProps) {
@@ -82,9 +84,9 @@ export function ThermalMap({
       <MapLegend />
 
       {/* Hotspot count badge */}
-      <div className="pointer-events-none absolute left-4 top-4 z-[1000] rounded-md border border-slate-700/60 bg-slate-900/90 px-3 py-1.5 backdrop-blur-sm">
+      <div className="pointer-events-none absolute left-4 top-[5.5rem] z-[1000] rounded-md border border-slate-700/60 bg-slate-900/90 px-3 py-1.5 backdrop-blur-sm">
         <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
-          Active Hotspots
+          {isDemoData ? "Sample hotspots" : "Active hotspots"}
         </p>
         <p className="font-mono text-sm font-bold text-slate-200">
           {hotspots.filter((h) => h.isHotspot).length}

@@ -2,7 +2,7 @@
 
 import { ParetoAnalytics } from "@/components/diagnostics/ParetoAnalytics";
 import { UrbanDiagnostics } from "@/components/diagnostics/UrbanDiagnostics";
-import { PLACEHOLDER_DIAGNOSTICS, PLACEHOLDER_PARETO } from "@/lib/constants";
+import { PLACEHOLDER_PARETO } from "@/lib/constants";
 
 interface DiagnosticsDrawerProps {
   open: boolean;
@@ -20,7 +20,6 @@ export function DiagnosticsDrawer({ open, onToggle }: DiagnosticsDrawerProps) {
         open ? "h-[min(40vh,320px)]" : "h-10"
       }`}
       aria-label="Urban diagnostics and analytics"
-      aria-expanded={open}
     >
       {/* Drawer handle / toggle bar */}
       <button

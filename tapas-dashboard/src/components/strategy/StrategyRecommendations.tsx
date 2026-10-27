@@ -164,14 +164,14 @@ export function StrategyRecommendations({
         <div className="flex items-end justify-between gap-4 border-b border-[#2d2d3f] pb-4">
           <div>
             <h3 className="text-sm font-bold uppercase tracking-wider text-[#ffb86c]">
-              Optimal Intervention Strategies
+              Example Intervention Strategies
             </h3>
             <p className="mt-1 text-xs text-gray-400">
-              NSGA-II ranked Pareto-optimal solutions for Ahmedabad urban heat mitigation
+              Illustrative strategy set · no model run is connected
             </p>
           </div>
           <span className="shrink-0 rounded-full border border-[#44475a] bg-[#1e1e2f] px-3 py-1 text-xs font-mono text-[#8be9fd]">
-            {recommendations.length} solutions deployed
+            {recommendations.length} sample strategies
           </span>
         </div>
 

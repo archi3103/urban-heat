@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { DiagnosticsSideDrawer } from "@/components/diagnostics/DiagnosticsSideDrawer";
 import { MapPanel } from "@/components/map/MapPanel";
 import { useHotspotData } from "@/hooks/useHotspotData";
@@ -13,16 +13,13 @@ import type { GSOEHotspot } from "@/types/hotspot";
  */
 export function HeatStressTab() {
   const [drawerOpen, setDrawerOpen] = useState(true);
-  const { hotspots, loading, error } = useHotspotData();
-  const [selectedHotspot, setSelectedHotspot] = useState<GSOEHotspot | null>(null);
+  const { hotspots, loading, error, isDemoData } = useHotspotData();
+  const [selectedHotspotId, setSelectedHotspotId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  // Set the first hotspot as default selection when data is loaded
-  useEffect(() => {
-    if (hotspots.length > 0 && !selectedHotspot) {
-      setSelectedHotspot(hotspots[0]);
-    }
-  }, [hotspots, selectedHotspot]);
+  const selectedHotspot =
+    hotspots.find((hotspot) => hotspot.gridId === selectedHotspotId) ??
+    hotspots[0] ??
+    null;
 
   return (
     <div
@@ -39,8 +36,11 @@ export function HeatStressTab() {
             hotspots={hotspots}
             loading={loading}
             error={error}
+            isDemoData={isDemoData}
             selectedHotspot={selectedHotspot}
-            onSelectHotspot={setSelectedHotspot}
+            onSelectHotspot={(hotspot: GSOEHotspot) =>
+              setSelectedHotspotId(hotspot.gridId)
+            }
           />
         </div>
         <DiagnosticsSideDrawer

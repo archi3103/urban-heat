@@ -58,11 +58,12 @@ export function ThermalHeatmapLayer({ points }: ThermalHeatmapLayerProps) {
     const tryMount = () => {
       cancelAnimationFrame(rafId);
       rafId = requestAnimationFrame(() => {
+        const container = map.getContainer();
+        if (container.clientWidth === 0 || container.clientHeight === 0) return;
+
         map.invalidateSize({ animate: false });
         if (mapHasSize(map)) {
           mountLayer();
-        } else if (!cancelled) {
-          tryMount();
         }
       });
     };

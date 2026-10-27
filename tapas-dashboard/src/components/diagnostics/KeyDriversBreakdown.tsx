@@ -61,7 +61,7 @@ export function KeyDriversBreakdown({ drivers }: KeyDriversBreakdownProps) {
           Key Driver Breakdown
         </h3>
         <p className="mt-0.5 text-[11px] text-slate-600">
-          Relative contribution to urban heat stress
+          Illustrative driver mix · not model output
         </p>
       </div>
 

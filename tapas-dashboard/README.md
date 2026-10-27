@@ -12,6 +12,10 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
+The dashboard opens with an illustrative Ahmedabad preview so the map and diagnostics
+work before project data is available. These sample locations and scenario values are
+not observed measurements or model output. Replace them with GSOE data when available.
+
 ## Project Structure
 
 ```
@@ -58,7 +62,10 @@ tapas-dashboard/
 
 ## Map Integration (react-leaflet)
 
-The central map reads GSOE hotspot data from `public/data/best_per_hotspot.csv`.
+The map uses an illustrative preview dataset in `src/lib/demoHotspots.ts` by default.
+To load a real GSOE CSV or JSON export, pass its public URL to `useHotspotData`, such as
+`useHotspotData("/data/ahmedabad_sorted_final.csv")`. Keep the `Grid_ID`, `EE_Lat`,
+`EE_Lon`, and scenario fields aligned with the parser's schema.
 
 ### CSV Schema (`best_per_hotspot.csv`)
 

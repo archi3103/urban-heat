@@ -1,6 +1,6 @@
 "use client";
 
-import type { GSOEHotspot, GSOEScenario } from "@/types/hotspot";
+import type { GSOEHotspot } from "@/types/hotspot";
 
 interface CoolingComparisonModalProps {
   isOpen: boolean;
